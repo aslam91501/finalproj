@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useAuth } from "../config/authHooks";  
 import { Outlet } from "react-router-dom";
-import { Button, Link, Popover, PopoverContent, PopoverTrigger, Tooltip } from "@nextui-org/react";
+import { Button, Link, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import { IoHomeOutline } from "react-icons/io5";
 import { IoIosLogOut } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa";
 
 const Layout = () => {
+
     const { redirectIfUnauthenticated, logout } = useAuth();
     useEffect(() => redirectIfUnauthenticated(), [])
 

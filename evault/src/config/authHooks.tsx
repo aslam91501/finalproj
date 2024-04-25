@@ -3,24 +3,44 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import pb from "./pb";
 import { Role } from "./models";
+import { authenticate, registerUser } from "../services/auth";
+import { useSDK } from "@metamask/sdk-react";
 
 export const useAuth = () => {
     const navigate = useNavigate();
     
+
+    const setToken = () => {
+        sessionStorage.setItem('authStatus', 'authenticated');
+    }
+
+    const unsetToken = () => {
+        sessionStorage.removeItem('authStatus');
+    }
+
     // Attempt Login
     const { mutate: attemptLogin } = useMutation({
-        mutationFn: ({ email, password }: { email: string, password: string }) => {
-            return pb.collection('users').authWithPassword(email, password);
-        },
-        onSuccess: () => {
-            toast.success('Success', {
-                theme: 'colored'
-            })
-            
-            navigate('/')
+        mutationFn: ({ addr }: { addr: string }) => authenticate(addr),
+        onSuccess: (result) => {
+            if(!!result){
+                toast.success('Success', {
+                    theme: 'colored'
+                })
+                
+                setToken();
+
+                navigate('/home')
+            } else {
+                toast.info('Account not found. Please register.', {
+                    theme: 'colored',
+                    autoClose: 2000
+                })
+
+                navigate('/register')
+            }
         },
         onError: () => {
-            toast.error('Invalid email or password', {
+            toast.error('Something went wrong.', {
                 theme: 'colored',
                 autoClose: 2000
             })
@@ -28,21 +48,17 @@ export const useAuth = () => {
     })
 
     const { mutate: register } = useMutation({
-        mutationFn: ({ email, password, name, role }: { email: string, password: string, name: string, role: Role }) => {
-            return pb.collection('users').create({
-                email,
-                password,
-                name,
-                role,
-                passwordConfirm: password
-            })
+        mutationFn: ({ email, name, role }: { email: string, name: string, role: Role }) => {
+            return registerUser({ email, name, role });
         },
         onSuccess: () => {
             toast.success('Success', {
                 theme: 'colored'
             })
             
-            navigate('/login')
+            setToken();
+
+            navigate('/home')
         },
         onError: () => {
             toast.error('Something went wrong', {
@@ -58,7 +74,10 @@ export const useAuth = () => {
     //     queryFn: () => pb.authStore.isValid,
     // })
 
-    const isLoggedIn = pb.authStore.isValid;
+    const { connected, sdk  } = useSDK();
+
+
+    const isLoggedIn = !!connected && sessionStorage.getItem('authStatus') === 'authenticated';
     // const loading = authStateLoading || authStateFetching;
 
 
@@ -70,13 +89,16 @@ export const useAuth = () => {
 
     const redirectIfUnauthenticated = () => {
         if(!isLoggedIn){
-            navigate('/login');
+            navigate('/');
         }
     }
 
     const logout = () => {
-        pb.authStore.clear();
-        navigate('/login');
+        // pb.authStore.clear();
+
+        sdk?.terminate();
+        unsetToken();
+        navigate('/');
     }
 
     return {

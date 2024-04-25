@@ -5,13 +5,19 @@ import pb from "../config/pb"
 import { CaseAccess } from "../config/models"
 
 export const HomePage = () => {
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ['getCasesWithAccess'],
-        queryFn: () => pb.collection('case_access').getFullList({ expand: 'case', filter: `user="${pb.authStore.model!.id}"` })
+        queryFn: () => {
+            return pb.collection('case_access')
+                .getFullList({ 
+                     expand: 'case', 
+                 //    filter: `user="${pb.authStore.model!.id}"` 
+                })
+        }
     })
 
     if(isLoading) return "Loading..."
-    if(isError) return "Something went wrong"
+    if(isError) { console.log(error); return "Something went wrong"}
     
     return (
     <div className="w-full pt-10 px-20">
