@@ -1,0 +1,185 @@
+[
+    {
+        "inputs": [],
+        "name": "caseCount",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "createCase",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "caseId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "fileName",
+                "type": "string"
+            }
+        ],
+        "name": "addFile",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "caseId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "fileId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "canRead",
+                "type": "bool"
+            },
+            {
+                "internalType": "bool",
+                "name": "canWrite",
+                "type": "bool"
+            }
+        ],
+        "name": "setFilePermission",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            }
+        ],
+        "name": "getCasesByCreator",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "caseId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getFilesByCase",
+        "outputs": [
+            {
+                "internalType": "tuple(string,address)[]",
+                "name": "",
+                "type": "tuple(string,address)[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "caseId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "fileId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "getFilePermissions",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "caseId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "fileId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getUsersWithFileAccess",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "CaseCreated",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "FileAdded",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "PermissionChanged",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "event"
+    }
+]
