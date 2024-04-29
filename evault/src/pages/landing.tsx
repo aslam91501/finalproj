@@ -4,15 +4,20 @@ import { Fingerprint } from "react-bootstrap-icons";
 import { useEffect, useState } from "react";
 import { useSDK } from "@metamask/sdk-react";
 import { useAuth } from "../config/authHooks";
+import { useContract } from "../hooks/contract";
 
 export const LandingPage = () => {
     const [noMetamask, setNoMetamask] = useState(false);
     const { attemptLogin, isLoggedIn } = useAuth();
     const { sdk, connected, connecting  } = useSDK();
 
+    const { ensureContractSelected } = useContract();
+
     useEffect(() => {
         if(!Boolean(window.ethereum))        
             setNoMetamask(true);
+
+        ensureContractSelected();
     }, [])
 
     const handleAuthenticate = async ()  => {

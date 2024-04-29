@@ -3,11 +3,11 @@ import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from './layout.tsx';
-import { LoginPage } from './pages/login.tsx';
 import { RegistrationPage } from "./pages/register.tsx";
 import { HomePage } from "./pages/home.tsx";
 import { ProfilePage } from "./pages/profile.tsx";
 import { LandingPage } from "./pages/landing.tsx";
+import { ContractsPage } from "./pages/contracts.tsx";
 
 function App() {
 	const navigate = useNavigate();
@@ -22,7 +22,7 @@ function App() {
 				</Route>
 				<Route>
 					<Route path="/" element={<LandingPage />} />
-					<Route path="/login" element={<LoginPage />} />
+					<Route path="/contracts" element={<ContractsPage />} />
 					<Route path="/register" element={<RegistrationPage />} />
 				</Route>
 			</Routes>

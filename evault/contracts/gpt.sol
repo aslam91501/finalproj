@@ -10,6 +10,8 @@ contract LegalCaseContract {
     struct LegalCase {
         uint id;
         address creator;
+        string title;
+        string description;
         mapping(address => bool) users;
         mapping(uint => File) files;
         uint fileCount;
@@ -18,14 +20,16 @@ contract LegalCaseContract {
     mapping(uint => LegalCase) cases;
     uint public caseCount;
     
-    event CaseCreated(uint indexed id, address indexed creator);
+    event CaseCreated(uint indexed id, address indexed creator, string title, string description);
     event FileAdded(uint indexed caseId, uint fileId, string fileName, address indexed owner);
-    event PermissionChanged(uint indexed caseId, uint fileId, address indexed user, bool canRead, bool canWrite);
+    event PermissionChanged(uint indexed caseId, uint fileId, address indexed user, bool hasAccess);
+    event AccessGranted(uint indexed caseId, address indexed user);
+    event AccessRevoked(uint indexed caseId, address indexed user);
     
-    function createCase() public {
+    function createCase(string memory title, string memory description) public {
         caseCount++;
-        cases[caseCount] = LegalCase(caseCount, msg.sender, 0);
-        emit CaseCreated(caseCount, msg.sender);
+        cases[caseCount] = LegalCase(caseCount, msg.sender, title, description);
+        emit CaseCreated(caseCount, msg.sender, title, description);
     }
     
     function addFile(uint caseId, string memory fileName) public {
@@ -37,14 +41,30 @@ contract LegalCaseContract {
         emit FileAdded(caseId, cases[caseId].fileCount, fileName, msg.sender);
     }
     
-    function setFilePermission(uint caseId, uint fileId, address user, bool canRead, bool canWrite) public {
+    function setFilePermission(uint caseId, uint fileId, address user, bool hasAccess) public {
         require(caseId <= caseCount && caseId > 0, "Invalid case ID");
         require(fileId <= cases[caseId].fileCount && fileId > 0, "Invalid file ID");
         require(cases[caseId].creator == msg.sender || cases[caseId].users[msg.sender], "You are not authorized to change permissions in this case");
         require(cases[caseId].files[fileId].owner == msg.sender, "You are not the owner of this file");
         
-        cases[caseId].files[fileId].permissions[user] = canRead || canWrite;
-        emit PermissionChanged(caseId, fileId, user, canRead, canWrite);
+        cases[caseId].files[fileId].permissions[user] = hasAccess;
+        emit PermissionChanged(caseId, fileId, user, hasAccess);
+    }
+
+    function grantAccess(uint caseId, address user) public {
+        require(caseId <= caseCount && caseId > 0, "Invalid case ID");
+        require(cases[caseId].creator == msg.sender || cases[caseId].users[msg.sender], "You are not authorized to grant access to this case");
+        
+        cases[caseId].users[user] = true;
+        emit AccessGranted(caseId, user);
+    }
+    
+    function revokeAccess(uint caseId, address user) public {
+        require(caseId <= caseCount && caseId > 0, "Invalid case ID");
+        require(cases[caseId].creator == msg.sender || cases[caseId].users[msg.sender], "You are not authorized to revoke access to this case");
+        
+        cases[caseId].users[user] = false;
+        emit AccessRevoked(caseId, user);
     }
 
     function getCasesByCreator(address creator) public view returns (uint[] memory) {

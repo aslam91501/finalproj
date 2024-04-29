@@ -1,13 +1,15 @@
 import { Button, Input, Switch } from "@nextui-org/react"
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../config/authHooks";
 import registerSvg from '/signup.svg';
+import { useContract } from "../hooks/contract";
 
 export const RegistrationPage = () => {
     const [isLawyer, setIsLawyer] = useState(true);
     const { register } = useAuth();
 
     const formRef = useRef<HTMLFormElement>(null);
+    const { ensureContractSelected } = useContract();
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -20,6 +22,8 @@ export const RegistrationPage = () => {
             role: isLawyer ? 'lawyer' : 'other'
         })
     }
+
+    useEffect(() => ensureContractSelected() , [])
 
     return (
         <div className="h-screen w-screen flex gap-20 items-center p-10">

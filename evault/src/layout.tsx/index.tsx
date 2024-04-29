@@ -5,11 +5,19 @@ import { Button, Link, Popover, PopoverContent, PopoverTrigger } from "@nextui-o
 import { IoHomeOutline } from "react-icons/io5";
 import { IoIosLogOut } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa";
+import { useContract } from "../hooks/contract";
 
 const Layout = () => {
-
+    const { ensureContractSelected } = useContract();
     const { redirectIfUnauthenticated, logout } = useAuth();
-    useEffect(() => redirectIfUnauthenticated(), [])
+
+
+
+    useEffect(() => { 
+        redirectIfUnauthenticated();
+
+        ensureContractSelected();
+    }, [])
 
     return (
         <div className="flex flex-col min-h-screen max-w-full w-screen bg-slate-50">
