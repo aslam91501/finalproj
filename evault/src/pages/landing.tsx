@@ -21,9 +21,7 @@ export const LandingPage = () => {
     }, [])
 
     const handleAuthenticate = async ()  => {
-        const result = await sdk?.connect();
-
-        attemptLogin(result);
+        attemptLogin();
     }
 
 

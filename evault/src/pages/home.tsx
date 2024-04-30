@@ -5,19 +5,19 @@ import pb from "../config/pb"
 import { CaseAccess } from "../config/models"
 
 export const HomePage = () => {
-    const { data, isLoading, isError, error } = useQuery({
-        queryKey: ['getCasesWithAccess'],
-        queryFn: () => {
-            return pb.collection('case_access')
-                .getFullList({ 
-                     expand: 'case', 
-                 //    filter: `user="${pb.authStore.model!.id}"` 
-                })
-        }
-    })
+    // const { data, isLoading, isError, error } = useQuery({
+    //     queryKey: ['getCasesWithAccess'],
+    //     queryFn: () => {
+    //         return pb.collection('case_access')
+    //             .getFullList({ 
+    //                  expand: 'case', 
+    //              //    filter: `user="${pb.authStore.model!.id}"` 
+    //             })
+    //     }
+    // })
 
-    if(isLoading) return "Loading..."
-    if(isError) { console.log(error); return "Something went wrong"}
+    // if(isLoading) return "Loading..."
+    // if(isError) { console.log(error); return "Something went wrong"}
     
     return (
     <div className="w-full pt-10 px-20">
@@ -28,7 +28,7 @@ export const HomePage = () => {
         </div>
 
         <div className="mt-5">
-            <CasesTable data={data as unknown as CaseAccess[]} />
+            {/* <CasesTable data={data as unknown as CaseAccess[]} /> */}
         </div>
     </div>
     )

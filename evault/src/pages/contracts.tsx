@@ -1,8 +1,9 @@
-import { Button, Listbox, ListboxItem, useDisclosure } from '@nextui-org/react';
+import { Button, Input, Link, Listbox, ListboxItem, useDisclosure } from '@nextui-org/react';
 import { CreateContractModal } from '../components/CreateContractModal';
 import contractSvg from '/selectContract.svg';
 import { Contract, useContract } from '../hooks/contract';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export const ContractsPage = () => {
     const { status, getAllContracts, createContract, setContractId, getContractId } = useContract();
@@ -10,12 +11,27 @@ export const ContractsPage = () => {
     const [contracts, setContracts] = useState<Contract[]>([]);
     const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
 
+    const [authenticated, setAuthenticated] = useState(false);
+    const [password, setPassword] = useState('');
+
     const { onClose, onOpen, isOpen } = useDisclosure();
+
+
+    const authenticate = () => {
+        if(password === 'adminpass'){
+            setAuthenticated(true);
+        }
+        else{
+            toast.error('Invalid password');
+        }
+    
+    }
 
     useEffect(() => {
         if(!!selectedContractId)
             setContractId(selectedContractId);
     }, [selectedContractId])
+
 
 
     useEffect(() => {
@@ -26,11 +42,26 @@ export const ContractsPage = () => {
         }
     }, [])
 
+    useEffect(() => {
+        if(status === 'success'){
+            setContracts(getAllContracts());
+            onClose();
+        }
+    }, [status])
+
     const handleCreateContract = (name: string, description: string) => {
         createContract({ name, description });
         setContracts(getAllContracts());
     }
 
+    if(!authenticated){
+        return (
+            <div className="h-screen w-screen flex items-center justify-center px-64 gap-5 flex-col">
+                <Input type='password' onChange={(e) => setPassword(e.target.value)} size='lg' className='w-96' label='Admin Password' />
+                <Button size='lg' color='primary' isDisabled={password === ''} onClick={authenticate}>Authenticate</Button>
+            </div>
+        )
+    }
 
     return <>
         <div className="h-screen w-screen flex gap-20 items-center p-20">
@@ -46,7 +77,7 @@ export const ContractsPage = () => {
                     loading={status === 'pending'}
                     handleSubmit={handleCreateContract} />
 
-                <Button color='default' isDisabled={selectedContractId === null}>Proceed</Button>
+                <Button as={Link} href='/' color='default' isDisabled={selectedContractId === null} isLoading={status === 'pending'}>Proceed</Button>
                 
                 { contracts.length === 0 && <p>No contracts found. Please create one to be listed here.</p> }
 

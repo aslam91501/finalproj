@@ -5,6 +5,9 @@ import pb from "./pb";
 import { Role } from "./models";
 import { authenticate, registerUser } from "../services/auth";
 import { useSDK } from "@metamask/sdk-react";
+import { ethers } from "ethers";
+import { abi } from "./vars";
+import { useContract } from "../hooks/contract";
 
 export const useAuth = () => {
     const navigate = useNavigate();
@@ -20,7 +23,7 @@ export const useAuth = () => {
 
     // Attempt Login
     const { mutate: attemptLogin } = useMutation({
-        mutationFn: ({ addr }: { addr: string }) => authenticate(addr),
+        mutationFn: () => authenticate(),
         onSuccess: (result) => {
             if(!!result){
                 toast.success('Success', {
@@ -39,13 +42,31 @@ export const useAuth = () => {
                 navigate('/register')
             }
         },
-        onError: () => {
+        onError: (err) => {
+            console.log(err)
+
             toast.error('Something went wrong.', {
                 theme: 'colored',
                 autoClose: 2000
             })
         },
     })
+
+    const { getContractId } = useContract();
+
+    async function authenticate(){
+        const provider = new ethers.JsonRpcProvider('HTTP://127.0.0.1:7545');
+        
+        const user = await sdk?.connect();
+
+        const contract = new ethers.Contract(getContractId()!, abi, provider);
+
+        const isRegistered = await contract.getIsRegistered(user[0]);
+
+        console.log('Is regisered value ', isRegistered)
+        
+        return isRegistered;
+    }
 
     const { mutate: register } = useMutation({
         mutationFn: ({ email, name, role }: { email: string, name: string, role: Role }) => {
@@ -60,7 +81,9 @@ export const useAuth = () => {
 
             navigate('/home')
         },
-        onError: () => {
+        onError: (err) => {
+            console.log(err)
+
             toast.error('Something went wrong', {
                 theme: 'colored',
                 autoClose: 2000
@@ -68,16 +91,20 @@ export const useAuth = () => {
         },
     })
     
-    // const { data: loginStateInfo, isLoading: authStateLoading, isFetching: authStateFetching } = useQuery({
-    //     queryKey: ['isLoggedIn'],
-    //     retry: 1,
-    //     queryFn: () => pb.authStore.isValid,
-    // })
+    async function registerUser({ email, name, role }: { email: string, name: string, role: Role }){
+        const provider = new ethers.BrowserProvider(window.ethereum!);
+        
+        const contract = new ethers.Contract(getContractId()!, abi, (await provider.getSigner()));
+
+        console.log(name, email, role)
+
+        await contract.registerUser(name, email, role === 'lawyer');
+    }
 
     const { connected, sdk  } = useSDK();
 
 
-    const isLoggedIn = !!connected && sessionStorage.getItem('authStatus') === 'authenticated';
+    const isLoggedIn = sessionStorage.getItem('authStatus') === 'authenticated';
     // const loading = authStateLoading || authStateFetching;
 
 
@@ -87,7 +114,7 @@ export const useAuth = () => {
         }
     }
 
-    const redirectIfUnauthenticated = () => {
+    const redirectIfUnauthenticated = () => {        
         if(!isLoggedIn){
             navigate('/');
         }
