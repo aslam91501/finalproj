@@ -6,10 +6,11 @@ import { IoHomeOutline } from "react-icons/io5";
 import { IoIosLogOut } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa";
 import { useContract } from "../hooks/contract";
+import { LuBookMinus } from "react-icons/lu";
 
 const Layout = () => {
     const { ensureContractSelected } = useContract();
-    const { redirectIfUnauthenticated, logout } = useAuth();
+    const { redirectIfUnauthenticated, logout, user } = useAuth();
 
 
 
@@ -19,12 +20,18 @@ const Layout = () => {
         ensureContractSelected();
     }, [])
 
+    if(!user) return <>Loading...</>
+
     return (
         <div className="flex flex-col min-h-screen max-w-full w-screen bg-slate-50">
             <nav className="border-b-1 flex items-center justify-center gap-8 h-16 text-sm bg-white font-mono uppercase">
                 {/* <Tooltip showArrow placement="bottom" content="Home" color="primary"> */}
-                    <Link href="/home" color="foreground">
+                    <Link href="/" color="foreground">
                         <IoHomeOutline size={20} />
+                    </Link>
+
+                    <Link href="/home" color="foreground">
+                        <LuBookMinus size={20} />
                     </Link>
                 {/* </Tooltip> */}
                 

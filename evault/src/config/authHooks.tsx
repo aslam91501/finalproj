@@ -8,10 +8,47 @@ import { useSDK } from "@metamask/sdk-react";
 import { ethers } from "ethers";
 import { abi } from "./vars";
 import { useContract } from "../hooks/contract";
+import { useEffect, useState } from "react";
+
+export interface User{
+    userAddress: string;
+    name: string;
+    email: string;
+    isLawyer: boolean;
+}
+
 
 export const useAuth = () => {
     const navigate = useNavigate();
     
+    const [user, setUser] = useState<User | null>(null);
+
+    function setUserData(user: User){
+        setUser(user);
+        sessionStorage.setItem('user', JSON.stringify(user));
+    }
+
+    function getUserFromStorage(){
+        const user = sessionStorage.getItem('user');
+
+        if(user){
+            setUser(JSON.parse(user));
+            
+            return JSON.parse(user);
+        }
+    
+        return null;
+    }
+
+    function deleteUserData(){
+        sessionStorage.removeItem('user');
+    }
+
+    useEffect(() => {
+        if(user === null){
+            getUserFromStorage();
+        }
+    }, [])
 
     const setToken = () => {
         sessionStorage.setItem('authStatus', 'authenticated');
@@ -65,10 +102,19 @@ export const useAuth = () => {
 
         console.log('Is regisered value ', isRegistered)
         
+        if(isRegistered){
+            setUser(user[0]);
+
+            const userData: any[] = await contract.getUser(user[0]);
+
+
+            setUserData({ userAddress: user[0], name: userData[1], email: userData[2], isLawyer: userData[3] });
+        }
+
         return isRegistered;
     }
 
-    const { mutate: register } = useMutation({
+    const { mutate: register, status: registrationStatus } = useMutation({
         mutationFn: ({ email, name, role }: { email: string, name: string, role: Role }) => {
             return registerUser({ email, name, role });
         },
@@ -99,9 +145,13 @@ export const useAuth = () => {
         console.log(name, email, role)
 
         await contract.registerUser(name, email, role === 'lawyer');
+
+        const userData: any[] = await contract.getUser((await provider.getSigner()).address);
+
+        setUserData({ userAddress: userData[0], name: userData[1], email: userData[2], isLawyer: userData[3] });
     }
 
-    const { connected, sdk  } = useSDK();
+    const { sdk  } = useSDK();
 
 
     const isLoggedIn = sessionStorage.getItem('authStatus') === 'authenticated';
@@ -114,7 +164,9 @@ export const useAuth = () => {
         }
     }
 
-    const redirectIfUnauthenticated = () => {        
+    const redirectIfUnauthenticated = () => {    
+        getUserFromStorage();
+
         if(!isLoggedIn){
             navigate('/');
         }
@@ -125,6 +177,7 @@ export const useAuth = () => {
 
         sdk?.terminate();
         unsetToken();
+        deleteUserData();
         navigate('/');
     }
 
@@ -134,7 +187,8 @@ export const useAuth = () => {
         redirectIfLoggedIn,
         redirectIfUnauthenticated,
         logout,
-        register
-        // loading,
+        register,
+        registrationStatus,
+        user
     }
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { abi, bytecode } from "../config/vars";
 
@@ -72,11 +72,13 @@ export const useContract = () => {
     }
 
     function isContractSelected(){
-        return !!sessionStorage.getItem('contractId');
+        // return !!sessionStorage.getItem('contractId');
+        return true;
     }
 
     function getContractId(){
-        return sessionStorage.getItem('contractId');
+        // return sessionStorage.getItem('contractId');
+        return '0x9C39419f1998599d650e065c0077053C37C926FB';
     }
 
     function setContractId(contractId: string){
@@ -90,4 +92,26 @@ export const useContract = () => {
     }
 
     return { status, getContractId, setContractId, isContractSelected, getAllContracts, createContract, ensureContractSelected };
+}
+
+export const useEventLogs = () => {
+    const { getContractId } = useContract();
+
+    const { data } = useQuery({
+        queryKey: ['logs'],
+        queryFn: () => getAllLogs(getContractId()!),
+        enabled: getContractId() !== null
+    })
+
+    async function getAllLogs(contractAddress: string){
+        const provider = new ethers.JsonRpcProvider('HTTP://127.0.0.1:7545');
+
+        const filter = {
+            address: contractAddress,
+        };
+
+        return provider.getLogs(filter);
+    }
+
+    return { logs: data }
 }

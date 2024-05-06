@@ -1,58 +1,52 @@
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem } from "@nextui-org/react";
-import { useQuery } from "@tanstack/react-query";
-import { format } from "timeago.js";
-import pb from "../config/pb";
-import { CaseAccess } from "../config/models";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Link } from "@nextui-org/react";
+import { Case, useCaseMutations } from "../hooks/case";
+import { useAuth } from "../config/authHooks";
 
 interface Props{
-    data: CaseAccess[]
+    data: Case[]
 }
 
 export const CasesTable = (props: Props) => {
+    const { user } = useAuth();
+    const { requestAccessStatus, requestAcc } = useCaseMutations();
+
+ 
+ 
     return (
-    <Table>
+    <Table >
         <TableHeader>
+            <TableColumn>Id</TableColumn>
             <TableColumn>Title</TableColumn>
             <TableColumn>Description</TableColumn>
-            <TableColumn>Created</TableColumn>
-            <TableColumn>Updated</TableColumn>
             <TableColumn>Actions</TableColumn>
         </TableHeader>
         <TableBody>
-            {props.data ? (props.data as unknown as CaseAccess[]).map((item, index) => {
+            { props.data.map((item, index) => {
                 return <TableRow key={index}>
-                    <TableCell>{item.expand.case.name}</TableCell>
-                    <TableCell>{item.expand.case.description}</TableCell>
-                    <TableCell>{format(item.expand.case.created)}</TableCell>
-                    <TableCell>{format(item.expand.case.updated)}</TableCell>
+                    <TableCell>{item.caseId}</TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
                     <TableCell>
-                        {/* <EditProjectModal 
-                            data={item}
-                            onClose={() => toggleEditModal(item.id)}
-                            isOpen={editModalOpen.get(item.id) ?? false} />
-
-                        <ProjectDeleteModal 
-                            data={item}
-                            onClose={() => toggleDeleteModal(item.id)}
-                            isOpen={deleteModalOpen.get(item.id) ?? false} /> */}
-
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Button color="default">Actions</Button>
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem href={`/p/${item.id}`}>View</DropdownItem>
-                                {/* <DropdownItem onClick={() => toggleEditModal(item.id)}>Edit</DropdownItem> */}
-                                <DropdownItem 
-                                    // onClick={() => toggleDeleteModal(item.id)}
-                                    color="danger" 
-                                    className="text-danger">Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                        { (item.access.includes(user?.userAddress.toUpperCase()!) || item.lawyer.toUpperCase() === user?.userAddress?.toUpperCase()) ? 
+                            <Button 
+                                isDisabled={requestAccessStatus === 'pending'} 
+                                isLoading={requestAccessStatus === 'pending'} 
+                                as={Link} href={`/cases/${item.caseId}/approvals`} 
+                                color="primary">
+                                    View Case
+                            </Button> 
+                            :
+                            <Button 
+                                isDisabled={requestAccessStatus === 'pending'} 
+                                isLoading={requestAccessStatus === 'pending'} 
+                                onClick={() => requestAcc(item.caseId)}>
+                                    Request Access
+                            </Button>
+                        }
                     </TableCell>
                 </TableRow>;
-            }) : <></>}
+            })} 
         </TableBody>
     </Table>
     )
-}
+}                                                                                                                                                                                                                               

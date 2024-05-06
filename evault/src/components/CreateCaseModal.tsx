@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Modal, Input, Button, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@nextui-org/react';
 import { useCaseMutations } from '../hooks/case';
+import { useAuth } from '../config/authHooks';
 
 export const CreateCaseModal = () => {
     const title = 'Create Case';
@@ -10,8 +11,15 @@ export const CreateCaseModal = () => {
     
     const formRef = useRef<HTMLFormElement>(null);
 
-    const { create } = useCaseMutations({ onComplete: onClose });
+    const { create, createStatus } = useCaseMutations({ onComplete: onClose });
 
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if(createStatus === 'success'){
+            onClose();
+        }
+    }, [createStatus])
 
     function handleSubmit(e: any){
         e.preventDefault();
@@ -25,7 +33,7 @@ export const CreateCaseModal = () => {
     }
     
     return <>
-        <Button variant="flat" className="bg-primary text-white" onPress={onOpen}>
+        <Button variant="flat" className="bg-primary text-white" onPress={onOpen} isDisabled={!user || !user.isLawyer}>
             New Case
         </Button>
 
@@ -56,10 +64,15 @@ export const CreateCaseModal = () => {
                         </form>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="danger" variant="light" onPress={onClose}>
+                        <Button color="danger" 
+                            isDisabled={createStatus === 'pending'}
+                            variant="light" onPress={onClose}>
                             Close
                         </Button>
-                        <Button color="primary" onPress={() => {submitButtonRef.current?.click();}}>
+                        <Button color="primary" 
+                            isDisabled={createStatus === 'pending'}
+                            isLoading={createStatus === 'pending'}
+                            onPress={() => {submitButtonRef.current?.click();}}>
                             Create Case
                         </Button>
                     </ModalFooter>

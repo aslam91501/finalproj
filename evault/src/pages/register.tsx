@@ -6,7 +6,7 @@ import { useContract } from "../hooks/contract";
 
 export const RegistrationPage = () => {
     const [isLawyer, setIsLawyer] = useState(true);
-    const { register } = useAuth();
+    const { register, registrationStatus } = useAuth();
 
     const formRef = useRef<HTMLFormElement>(null);
     const { ensureContractSelected } = useContract();
@@ -57,7 +57,7 @@ export const RegistrationPage = () => {
 
                     <Switch isSelected={isLawyer} onValueChange={setIsLawyer} name="isLawyer">Are you a lawyer?</Switch>
 
-                    <Button type="submit" color="primary"  className='w-fit'>
+                    <Button type="submit" color="primary" isLoading={registrationStatus === 'pending'} isDisabled={registrationStatus === 'pending'} className='w-fit'>
                         Register
                     </Button>
                 </form>

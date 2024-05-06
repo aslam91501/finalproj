@@ -35,7 +35,7 @@ export const LandingPage = () => {
 
                 {noMetamask && <p className="text-red-500">Please install Metamask to continue</p>}
 
-                {!noMetamask && !connected && 
+                {!noMetamask && !isLoggedIn && 
                 <Button
                     onClick={handleAuthenticate}
                     startContent={
@@ -44,8 +44,7 @@ export const LandingPage = () => {
                     className="bg-primary text-lg text-white" size="lg">Authenticate</Button>
                 }
 
-                {connected && isLoggedIn && <Button as={Link} href="/home" className="bg-primary text-lg text-white" size="lg">Go to Dashboard</Button>}
-                {connected && !isLoggedIn && <Button as={Link} href="/register" className="bg-primary text-lg text-white" size="lg">Register</Button>}
+                {isLoggedIn && <Button as={Link} href="/home" className="bg-primary text-lg text-white" size="lg">Go to Dashboard</Button>}
             </div>
         </div>
 
