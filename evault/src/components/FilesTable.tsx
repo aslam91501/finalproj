@@ -1,16 +1,17 @@
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Link } from "@nextui-org/react";
 import { useAuth, User } from "../config/authHooks";
 import { Approval, Case, getCaseById, useCaseMutations } from "../hooks/case";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { CaseFile } from "../hooks/file";
+import { pinataGateway } from "../config/vars";
 
 interface Props{
-    data: Approval[]
+    data: CaseFile[]
 }
 
 export const FilesTable = (props: Props) => {
     const { user } = useAuth();
-    const { revoke, revokeStatus } = useCaseMutations();
 
     const { id } = useParams();
 
@@ -32,18 +33,22 @@ export const FilesTable = (props: Props) => {
     <Table>
         <TableHeader>
             <TableColumn>File Name</TableColumn>
+            <TableColumn>IPFS Hash</TableColumn>
             <TableColumn>Actions</TableColumn>
         </TableHeader>
         <TableBody>
-            {props.data ? props.data.map((user, index) => {
+            {props.data ? props.data.map((file, index) => {
                 return <TableRow key={index}>
-                    <TableCell>{user.approved}</TableCell>
+                    <TableCell>{file.name}</TableCell>
+                    <TableCell>{file.ipfsHash}</TableCell>
                     <TableCell>
-                        <Button color="danger" 
-                            isDisabled={ revokeStatus === 'pending'  }
+                        <Button color="primary" 
                             // onClick={() => revoke({ caseId: id!, clientId: user })}
+                            as={Link}
+                            href={`${pinataGateway}/${file.ipfsHash}`}
+                            target="_blank"
                         >    
-                            Revoke Access
+                            View
                         </Button>
                     </TableCell>
                 </TableRow>;

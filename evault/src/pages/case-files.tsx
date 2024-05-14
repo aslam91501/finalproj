@@ -14,26 +14,26 @@ export const CaseFilesPage = () => {
 
     const ref = useRef<HTMLInputElement>(null);
 
-    const [approvals, setApprovals] = useState<Approval[] | null>(null);
+    // const [approvals, setApprovals] = useState<Approval[] | null>(null);
 
     const { uploadFile, uploadStatus } = useFiles();
 
     useEffect(() => {
-        console.log(approvals)
+        // console.log(approvals)
         console.log(data)
 
-        if(data){
-        const mappedApprovals: Approval[] = data.map((c: any) => {
-            return {
-                caseId: c[0],
-                client: c[1],
-                lawyer: c[2],
-                approved: c[3]
-            }
-        })
+        // if(data){
+        // const mappedApprovals: Approval[] = data.map((c: any) => {
+        //     return {
+        //         caseId: c[0],
+        //         client: c[1],
+        //         lawyer: c[2],
+        //         approved: c[3]
+        //     }
+        // })
 
-        setApprovals(mappedApprovals);
-        }
+        // setApprovals(mappedApprovals);
+        // }
     }, [data])
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +47,7 @@ export const CaseFilesPage = () => {
 
 
     
-    if(isLoading || approvals === null) return "Loading..."
+    if(isLoading) return "Loading..."
     if(isError) { return "Something went wrong"}
     
     return (
@@ -65,7 +65,7 @@ export const CaseFilesPage = () => {
         <Button isLoading={uploadStatus === 'pending'} isDisabled={uploadStatus === 'pending'} className="mt-4" startContent={<IoAddOutline size={25} />} color="primary" onClick={() => ref.current?.click() }>Upload File</Button>
 
         <div className="mt-5">
-            <FilesTable data={approvals} />
+            <FilesTable data={data!} />
         </div>
     </div>
     )

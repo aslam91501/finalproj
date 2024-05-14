@@ -94,7 +94,11 @@ export const useFiles = () => {
    }
 }
 
-export interface CaseFile{}
+export interface CaseFile{
+  name: string;
+  ipfsHash: string;
+  uploader: string;
+}
 
 export const getFiles = () => {
   const {id: caseId} = useParams();
@@ -116,7 +120,15 @@ export const getFiles = () => {
 
       console.log(data);
 
-      return data;
+      const caseFiles: CaseFile[] = data.map((c: any) => {
+        return {
+            name: c[0],
+            ipfsHash: c[1],
+            uploader: c[2]
+        }
+      })
+
+      return caseFiles;
   }
 
   return {
