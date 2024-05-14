@@ -20,8 +20,8 @@ export const CaseApprovalsPage = () => {
         const mappedApprovals: Approval[] = data.map((c: any) => {
             return {
                 caseId: c[0],
-                client: c[1],
-                lawyer: c[2],
+                client: c[2],
+                lawyer: c[1],
                 approved: c[3]
             }
         })

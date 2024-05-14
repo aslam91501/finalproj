@@ -14,13 +14,15 @@ export const HomePage = () => {
         if(data !== undefined && data !== null){
             if(data.length === 0) return setCases([]);
 
+            console.log(data);
+
             const mappedCases: Case[] = data.map((c: any) => {
                 return {
                     caseId: c[0],
                     name: c[1],
                     description: c[2],
                     lawyer: c[3],
-                    access: c[4]
+                    access: c[4].map((a: string) => a.toUpperCase())
                 }
             })
 

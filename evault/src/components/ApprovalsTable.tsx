@@ -8,9 +8,9 @@ interface Props{
 
 export const ApprovalsTable = (props: Props) => {
     const { user } = useAuth();
-    // const { requestAccessStatus, requestAcc } = useCaseMutations();
+    const { approve, approveStatus } = useCaseMutations();
 
-    console.log(props?.data[0]?.lawyer.toUpperCase().trim())
+    console.log(props?.data[0])
     console.log(user?.userAddress?.toUpperCase().trim())
 
 
@@ -31,7 +31,18 @@ export const ApprovalsTable = (props: Props) => {
                     <TableCell>{item.lawyer}</TableCell>
                     <TableCell>{item.approved ? "Approved" : "Pending"}</TableCell>
                     <TableCell>
-                        <Button color="primary" isDisabled={(user?.userAddress.toUpperCase().trim() !== item.lawyer.toUpperCase().trim()) || item.approved }>Approve</Button>
+                        <Button color="primary" 
+                            isDisabled={
+                                (user?.userAddress.toUpperCase().trim() !== item.lawyer.toUpperCase().trim()) 
+                                    || 
+                                item.approved
+                                    ||
+                                approveStatus === 'pending'
+                            }
+                            onClick={() => approve({ caseId: item.caseId, clientId: item.client })}
+                        >    
+                            Approve
+                        </Button>
                     </TableCell>
                 </TableRow>;
             }) : <></>}

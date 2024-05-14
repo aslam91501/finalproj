@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { abi, bytecode } from "../config/vars";
+import { abi, bytecode, deployedContractAddress } from "../config/vars";
 
 export interface Contract{
     address: string;
@@ -78,7 +78,7 @@ export const useContract = () => {
 
     function getContractId(){
         // return sessionStorage.getItem('contractId');
-        return '0x9C39419f1998599d650e065c0077053C37C926FB';
+        return deployedContractAddress;
     }
 
     function setContractId(contractId: string){

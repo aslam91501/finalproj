@@ -57,7 +57,15 @@ contract Evault{
         bool approved;
     }
 
-    Case[] public allCases;
+    struct CaseFile{
+        string name;
+        string ipfsHash;
+        address uploader;
+    }
+
+    mapping (string => CaseFile[]) caseFiles;
+
+    string[] public allCaseIds;
 
     mapping(string => Case) cases;
     mapping(string => ApprovalRequest[]) approvalRequests;
@@ -69,7 +77,9 @@ contract Evault{
         require(users[msg.sender].isLawyer, "User not a lawyer");
 
         cases[_caseId] = Case(_caseId, _name, _description, msg.sender, new address[](0));
-        allCases.push(cases[_caseId]);
+        cases[_caseId].access.push(msg.sender);
+ 
+        allCaseIds.push(_caseId);
 
         emit CaseCreated(_caseId, _name, _description, msg.sender);
     }
@@ -79,6 +89,12 @@ contract Evault{
     }
 
     function getAllCases() public view returns(Case[] memory){
+        Case[] memory allCases = new Case[](allCaseIds.length);
+
+        for(uint i = 0; i < allCaseIds.length; i++){
+            allCases[i] = cases[allCaseIds[i]];
+        }
+
         return allCases;
     }
 
@@ -90,6 +106,14 @@ contract Evault{
 
     function requestAccess(string memory _caseId) public{
         require(registered[msg.sender], "User not registered");
+
+        for(uint i = 0; i < approvalRequests[_caseId].length; i++){
+            if(approvalRequests[_caseId][i].client == msg.sender){
+                approvalRequests[_caseId][i] = approvalRequests[_caseId][approvalRequests[_caseId].length - 1];
+                approvalRequests[_caseId].pop();
+                break;
+            }
+        }
 
         approvalRequests[_caseId].push(ApprovalRequest(_caseId, cases[_caseId].lawyer, msg.sender, false));
 
@@ -130,5 +154,40 @@ contract Evault{
         }
 
         emit AccessRevoked(_caseId, msg.sender, _client);
+    }
+
+    function getUsersWithAccess(string memory _caseId) public view returns(User[] memory){
+        address[] memory access = cases[_caseId].access;
+        User[] memory usersWithAccess = new User[](access.length);
+
+        for(uint i = 0; i < access.length; i++){
+            usersWithAccess[i] = users[access[i]];
+        }
+
+        return usersWithAccess;
+    }
+
+    event FileUploaded(string caseId, string name, string ipfsHash, address uploader);
+
+    function uploadFile(string memory _caseId, string memory _name, string memory _ipfsHash) public{
+        require(registered[msg.sender], "User not registered");
+
+        bool hasAccess = false;
+        for(uint i = 0; i < cases[_caseId].access.length; i++){
+            if(cases[_caseId].access[i] == msg.sender){
+                hasAccess = true;
+                break;
+            }
+        }
+
+        require(hasAccess, "User does not have access to the case");
+
+        caseFiles[_caseId].push(CaseFile(_name, _ipfsHash, msg.sender));
+
+        emit FileUploaded(_caseId, _name, _ipfsHash, msg.sender);
+    }
+
+    function getCaseFiles(string memory _caseId) public view returns(CaseFile[] memory){
+        return caseFiles[_caseId];
     }
 }

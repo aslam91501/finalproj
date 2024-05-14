@@ -10,7 +10,8 @@ export const CasesTable = (props: Props) => {
     const { user } = useAuth();
     const { requestAccessStatus, requestAcc } = useCaseMutations();
 
- 
+    console.log(user?.userAddress?.toUpperCase())
+    console.log(props.data[0]?.access)
  
     return (
     <Table >
